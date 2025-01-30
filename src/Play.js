@@ -8,6 +8,7 @@ class Play extends Phaser.Scene {
         this.SHOT_VELOCITY_X = 200;
         this.SHOT_VELOCITY_Y_MIN = 700;
         this.SHOT_VELOCITY_Y_MAX = 1100;
+        this.moveSpeed = -2;
     }
 
     preload() {
@@ -70,8 +71,12 @@ class Play extends Phaser.Scene {
         // add pointer input
         this.input.on("pointerdown", (pointer) => {
             let shotDirection = pointer.y <= this.ball.y ? 1 : -1;
+            let shotDirectionX = pointer.x <= this.ball.x ? 1 : -1;
             this.ball.body.setVelocityX(
-                Phaser.Math.Between(-this.SHOT_VELOCITY_X, this.SHOT_VELOCITY_X)
+                Phaser.Math.Between(
+                    this.SHOT_VELOCITY_X,
+                    this.SHOT_VELOCITY_X * 2
+                ) * shotDirectionX
             );
             this.ball.body.setVelocityY(
                 Phaser.Math.Between(
@@ -83,7 +88,10 @@ class Play extends Phaser.Scene {
 
         // cup/ball collision
         this.physics.add.collider(this.ball, this.cup, (ball, cup) => {
-            ball.destroy();
+            //ball.destroy();
+            ball.body.setVelocity(0, 0);
+            ball.x = width / 2;
+            ball.y = height - height / 10;
         });
 
         // ball/wall collision
@@ -94,13 +102,20 @@ class Play extends Phaser.Scene {
         this.physics.add.collider(this.ball, this.oneWay);
     }
 
-    update() {}
+    update() {
+        this.oneWay.x += this.moveSpeed;
+        if (this.oneWay.x > width - this.oneWay.width / 2) {
+            this.moveSpeed = -2;
+        } else if (this.oneWay.x < this.oneWay.width / 2) {
+            this.moveSpeed = 2;
+        }
+    }
 }
 /*
 CODE CHALLENGE
 Try to implement at least 3/4 of the following features during the remainder of class (hint: each takes roughly 15 or fewer lines of code to implement):
-[ ] Add ball reset logic on successful shot
-[ ] Improve shot logic by making pointer’s relative x-position shoot the ball in correct x-direction
-[ ] Make one obstacle move left/right and bounce against screen edges
+[x] Add ball reset logic on successful shot
+[x] Improve shot logic by making pointer’s relative x-position shoot the ball in correct x-direction
+[x] Make one obstacle move left/right and bounce against screen edges
 [ ] Create and display shot counter, score, and successful shot percentage
 */
