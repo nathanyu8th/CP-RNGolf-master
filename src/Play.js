@@ -103,7 +103,6 @@ class Play extends Phaser.Scene {
     }
 
     update() {
-        console.log("help")
         this.oneWay.x += this.moveSpeed;
         if (this.oneWay.x > width - this.oneWay.width / 2) {
             this.moveSpeed = -2;
